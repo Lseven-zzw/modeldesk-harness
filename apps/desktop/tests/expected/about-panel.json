@@ -1,53 +1,53 @@
 {
   "darwin:en-US": {
     "menu": [
-      { "label": "About DeepSeek Harness", "role": "about" },
+      { "label": "About ModelDesk Harness", "role": "about" },
       { "type": "separator" }
     ],
     "options": {
-      "applicationName": "DeepSeek Harness",
+      "applicationName": "ModelDesk Harness · ModelDesk Harness",
       "applicationVersion": "1.0.0",
       "version": "",
-      "copyright": "",
+      "copyright": "山东金东数字传媒",
       "iconPath": "<app icon>"
     }
   },
   "darwin:zh-CN": {
     "menu": [
-      { "label": "关于 DeepSeek Harness", "role": "about" },
+      { "label": "关于 ModelDesk Harness", "role": "about" },
       { "type": "separator" }
     ],
     "options": {
-      "applicationName": "DeepSeek Harness",
+      "applicationName": "ModelDesk Harness · ModelDesk Harness",
       "applicationVersion": "1.0.0",
       "version": "",
-      "copyright": "",
+      "copyright": "山东金东数字传媒",
       "iconPath": "<app icon>"
     }
   },
   "win32:zh-CN": {
     "menu": [
-      { "label": "关于 DeepSeek Harness" },
+      { "label": "关于 ModelDesk Harness" },
       { "type": "separator" }
     ],
     "options": {
-      "applicationName": "DeepSeek Harness",
+      "applicationName": "ModelDesk Harness · ModelDesk Harness",
       "applicationVersion": "1.0.0",
       "version": "",
-      "copyright": "",
+      "copyright": "山东金东数字传媒",
       "iconPath": "<app icon>"
     }
   },
   "win32:en-US": {
     "menu": [
-      { "label": "About DeepSeek Harness" },
+      { "label": "About ModelDesk Harness" },
       { "type": "separator" }
     ],
     "options": {
-      "applicationName": "DeepSeek Harness",
+      "applicationName": "ModelDesk Harness · ModelDesk Harness",
       "applicationVersion": "1.0.0",
       "version": "",
-      "copyright": "",
+      "copyright": "山东金东数字传媒",
       "iconPath": "<app icon>"
     }
   }

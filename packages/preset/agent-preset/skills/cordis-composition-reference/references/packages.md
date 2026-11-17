@@ -337,6 +337,12 @@ Every package below exports a Cordis plugin that a bundle patch can name in a Lo
 | `@deepseek-ai/dsh-mcp-manager` | yes | MCP server manager: a settings-driven fleet of mcp-client instances with runtime status, restart, and probe |
 | `@deepseek-ai/dsh-mcp-resources` | no | Scoped MCP resource discovery and reading through shared model tools |
 
+## modeldesk
+
+| Package | Config | Description |
+|---|---|---|
+| `@modeldesk/dsh-enterprise` | no | ModelDesk Harness enterprise sign-in, session, and settings surfaces |
+
 ## plan
 
 | Package | Config | Description |

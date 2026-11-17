@@ -1,0 +1,21 @@
+- id: deepseek-account
+  disabled: true
+- id: llm-deepseek-account
+  disabled: true
+- id: account-controller
+  disabled: true
+- id: ui-settings-account
+  disabled: true
+- id: ui-brand-official
+  disabled: true
+
+- insert:
+    - id: modeldesk-enterprise
+      name: '@modeldesk/dsh-enterprise'
+      inject: [credentials]
+    - id: enterprise-skill-filesystem
+      name: '@deepseek-ai/dsh-skill-filesystem'
+      config:
+        providerName: enterprise-filesystem
+        includeDefaultRoots: false
+        bundledSkillDir: !!js "process.env.MODELDESK_ENTERPRISE_SKILL_DIR"

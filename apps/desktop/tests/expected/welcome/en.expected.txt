@@ -1,6 +1,6 @@
-DeepSeek Harness
-DeepSeek Harness
-Welcome to DeepSeek Harness
-Build potential. Explore intelligence.
+ModelDesk Harness
+ModelDesk Harness
+Welcome to ModelDesk Harness
+Governed AI for every team.
 Sign in
 Add API Key

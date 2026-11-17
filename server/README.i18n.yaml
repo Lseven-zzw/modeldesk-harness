@@ -1,0 +1,28 @@
+# Bilingual-pair consistency record for README.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write server/README.md
+/modeldesk-server:
+  en: 4e9a0778be495027
+  zh: 9c2b6ea7eab5184d
+/modeldesk-server/local-development:
+  en: 600d67f4a3500e13
+  zh: 5b7da658ec673f77
+/modeldesk-server/personal-and-enterprise-libraries:
+  en: 3544cd889a83c3cd
+  zh: 01cba93c6168cc5e
+/modeldesk-server/docker-compose:
+  en: 272ab454be7770b8
+  zh: b3e694a3735f72a5
+/modeldesk-server/administration-roles-and-permissions:
+  en: 71e1d1fb4ad19a4f
+  zh: 14991a1890956b5e
+/modeldesk-server/enterprise-skills:
+  en: 284a369ba233c859
+  zh: a85721620ebd4ea6
+/modeldesk-server/enterprise-documents:
+  en: 16b22fcec789ad54
+  zh: ed904ceb94f1ad68
+/modeldesk-server/enterprise-mcp:
+  en: ef0ebe3a5293abfa
+  zh: beafa2d97bdef6ab

@@ -1,7 +1,7 @@
-DeepSeek Harness
-DeepSeek Harness
+ModelDesk Harness
+ModelDesk Harness
 Add an API key to get started
-Configure official DeepSeek models to start using Harness
+Enter a provider API key to use ModelDesk Harness
 Enter API key [password]
 Save and continue [disabled]
 Set up later

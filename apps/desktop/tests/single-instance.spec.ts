@@ -17,16 +17,17 @@ describe('desktop single-instance ownership', () => {
   })
 
   it('routes a later launch to the primary process', () => {
-    let secondInstance: (() => void) | undefined
+    let secondInstance: ((event: unknown, argv: string[]) => void) | undefined
     const focus = vi.fn()
     const application = {
       requestSingleInstanceLock: () => true,
       quit: vi.fn(),
-      on: vi.fn((_event: 'second-instance', listener: () => void) => { secondInstance = listener }),
+      on: vi.fn((_event: 'second-instance', listener: NonNullable<typeof secondInstance>) => { secondInstance = listener }),
     } satisfies DesktopSingleInstanceApplication
 
     expect(claimDesktopSingleInstance(application, focus)).toBe(true)
-    secondInstance?.()
-    expect(focus).toHaveBeenCalledOnce()
+    const argv = ['ModelDeskHarness.exe', 'modeldesk://login?server=https%3A%2F%2Fmodeldesk.example.com']
+    secondInstance?.({}, argv)
+    expect(focus).toHaveBeenCalledExactlyOnceWith(argv)
   })
 })

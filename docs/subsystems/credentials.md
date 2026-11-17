@@ -367,6 +367,101 @@ abstract getDeviceIdentity(): Promise<{ deviceId?: string; userId?: AccountUserI
 
 Source: [`packages/credentials/deepseek-account/src/index.ts`](../../packages/credentials/deepseek-account/src/index.ts)
 
+<a id="ctxmodeldeskaccount--modeldeskaccount"></a>
+
+### `ctx.modeldeskAccount` — `ModelDeskAccount`
+
+The enterprise service consumed as `ctx.modeldeskAccount`.
+
+```ts cordis-catalog
+/**
+ * Read-only snapshot for the settings page.
+ * @returns The current account view without tokens.
+ */
+async state(): Promise<EnterpriseView>
+
+/**
+ * Save the platform address. Changing it signs out.
+ * @param raw - address typed by the employee.
+ * @returns The current account view without tokens.
+ */
+async saveBaseUrl(raw: string): Promise<EnterpriseView>
+
+/**
+ * Subscribe to state changes; the returned function unsubscribes.
+ * @param listener - Receives account updates while subscribed.
+ * @returns A function that removes the listener.
+ */
+subscribe(listener: (view: EnterpriseView) => void): () => void
+
+/**
+ * A usable access token; throws `signed_out`/`session_expired`.
+ * @returns A usable access token for the current session.
+ */
+async accessToken(): Promise<string>
+
+/**
+ * Recover from a 401 on `usedToken`.
+ * @param usedToken - Token rejected by the previous upstream request.
+ * @returns A usable access token after session recovery.
+ */
+async recover(usedToken: string): Promise<string>
+
+/**
+ * Authorized models, optionally bypassing the cache.
+ * @param force - Fetch a fresh catalog even when a cached catalog exists.
+ * @returns The authorized model catalog.
+ */
+async models(force: boolean = false): Promise<readonly ModelDeskModel[]>
+
+/**
+ * Open a model response using the signed-in employee's session.
+ * @param body - Request or response body for the model gateway.
+ * @param signal - Cancels the outbound request or stream.
+ * @returns The response body received from the model gateway.
+ */
+async complete(body: Record<string, unknown>, signal?: AbortSignal): Promise<ReadableStream<Uint8Array<ArrayBuffer>>>
+
+/**
+ * Read the published capabilities for the current enterprise account.
+ * @returns Authorized skills and MCP services for the current employee.
+ */
+async capabilities(): Promise<ModelDeskCapabilities>
+
+/**
+ * This month's usage.
+ * @returns Usage and quota for the current billing month.
+ */
+async usage(): Promise<ModelDeskUsage>
+
+/**
+ * Begin sign-in against the saved platform address.
+ * @returns The browser authorization URL and its expiration.
+ */
+async startLogin(): Promise<{ authorizeUrl: string; expiresAt: string }>
+
+/**
+ * Paste a ticket delivered out of band.
+ * @param ticket - One-time authorization code copied from the browser.
+ * @returns The current account view without tokens.
+ */
+async submitTicket(ticket: string): Promise<EnterpriseView>
+
+/**
+ * Abort the waiting attempt.
+ * @returns The current account view without tokens.
+ */
+async cancelLogin(): Promise<EnterpriseView>
+
+/**
+ * Sign out; keeps the platform address.
+ * @returns The current account view without tokens.
+ */
+async logout(): Promise<EnterpriseView>
+```
+
+Source: [`packages/modeldesk/enterprise/src/index.ts`](../../packages/modeldesk/enterprise/src/index.ts)
+
 <a id="authorization-events"></a>
 
 ### `authorization/*` events

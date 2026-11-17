@@ -1,0 +1,26 @@
+name: modeldesk-dev
+
+services:
+  mysql:
+    image: mysql:5.7
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --explicit_defaults_for_timestamp=1
+    environment:
+      MYSQL_ROOT_PASSWORD: dev-root
+      MYSQL_DATABASE: modeldesk
+      MYSQL_USER: modeldesk
+      MYSQL_PASSWORD: modeldesk
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - mysql-dev:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysql -h 127.0.0.1 -umodeldesk -p\"$$MYSQL_PASSWORD\" modeldesk -e 'SELECT 1'"]
+      interval: 5s
+      timeout: 5s
+      retries: 24
+
+volumes:
+  mysql-dev:

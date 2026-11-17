@@ -380,3 +380,18 @@ describe('matrix row: takeover (orthogonal axis)', () => {
     expect(shell.snapshot.draft).toBe('/goal ')
   })
 })
+
+it('adds library references as native file chips without changing adjacent text', () => {
+  const { shell } = bench()
+  act(() => shell.setDraft('Keep this text'))
+  const span = shell.actions.captureInsertion()
+  const refs = [{
+    source: 'modeldesk-library', ref: 'personal:1:1', label: 'costs.csv',
+    appearance: 'file' as const, clipboardText: 'costs.csv',
+  }]
+  act(() => { expect(shell.actions.insertReferences(refs, span)).toBe(true) })
+  expect(shell.snapshot.draft).toContain('Keep this text')
+  expect(shell.snapshot.draft).toContain('costs.csv')
+  expect(shell.snapshot.occurrences).toMatchObject(refs)
+  act(() => { expect(shell.actions.insertReferences(refs, span)).toBe(false) })
+})

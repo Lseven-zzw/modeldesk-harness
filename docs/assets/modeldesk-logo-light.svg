@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="196" viewBox="0 0 600 196">
+<defs>
+    <linearGradient id="modeldesk-gradient" x1="64" y1="64" x2="448" y2="448" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#72D5FA"/>
+      <stop offset="1" stop-color="#4F7DFF"/>
+    </linearGradient>
+  </defs>
+<g transform="translate(227.55 25.55) scale(0.283019)"><g fill="none" stroke="url(#modeldesk-gradient)" stroke-width="48" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 72 328 V 160 L 164 246 L 256 128 L 348 246 L 440 160 V 328"/>
+    <path d="M 72 384 H 440"/>
+  </g></g>
+</svg>

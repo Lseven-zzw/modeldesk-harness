@@ -11,6 +11,7 @@ interface ReadyEvent {
   readonly type: 'ready'
   readonly url: string
   readonly injections?: readonly unknown[] | undefined
+  readonly accountMode?: 'enterprise' | undefined
 }
 
 interface FatalEvent {
@@ -71,6 +72,7 @@ function isDesktopHostEvent(message: unknown): message is DesktopHostEvent {
       return true
     case 'ready':
       return typeof candidate.url === 'string'
+        && (candidate.accountMode === undefined || candidate.accountMode === 'enterprise')
     case 'platform-session': {
       const session = candidate.session
       if (session === null) return true
@@ -127,6 +129,7 @@ async function exitsWithin(exit: Promise<void>, milliseconds: number): Promise<b
 export interface DesktopHostReady {
   readonly url: string
   readonly injections?: readonly unknown[] | undefined
+  readonly accountMode?: 'enterprise' | undefined
 }
 
 /** The child has exited, but task teardown did not finish successfully. */
@@ -158,6 +161,8 @@ export class DesktopHostFatalError extends Error {
 export class DesktopHostProcess {
   private runId: PluginOperationRunId | undefined
   private child: ChildProcess | undefined
+  /** Process identity used to reject stale ModelDesk control handshakes. */
+  get pid(): number | undefined { return this.child?.pid }
   private readyResolve!: (ready: DesktopHostReady) => void
   private readyReject!: (error: Error) => void
   private readonly readyPromise = new Promise<DesktopHostReady>((resolve, reject) => {
@@ -244,7 +249,10 @@ export class DesktopHostProcess {
         return
       }
       if (message.type === 'starting') this.runId = message.runId
-      else if (message.type === 'ready') this.readyResolve({ url: message.url, injections: message.injections })
+      else if (message.type === 'ready') this.readyResolve({
+        url: message.url, injections: message.injections,
+        ...(message.accountMode === 'enterprise' ? { accountMode: message.accountMode } : {}),
+      })
       else if (message.type === 'platform-session') this.onPlatformSession?.(message.session)
       else if (message.type === 'shutdown-complete') {
         if (this.stopping) this.shutdownCompleted = true

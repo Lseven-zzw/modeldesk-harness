@@ -1,0 +1,54 @@
+name: ModelDesk CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  server:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: ci-root
+          MYSQL_DATABASE: modeldesk
+          MYSQL_USER: modeldesk
+          MYSQL_PASSWORD: ci-password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.12'
+      - run: uv sync --locked
+      - run: uv run --locked pytest -q
+      - name: Initialize a new MySQL database
+        run: uv run --locked alembic upgrade head
+        env:
+          MODELDESK_DATABASE_URL: mysql+pymysql://modeldesk:ci-password@127.0.0.1:3306/modeldesk?charset=utf8mb4
+
+  admin:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server/admin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm install -g pnpm@11.28.5
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+      - run: pnpm build

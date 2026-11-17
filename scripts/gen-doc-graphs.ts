@@ -499,6 +499,14 @@ const SERVICE_ROLES: ServiceRole[] = [
     note: 'The Host owns browser authorization and local credentials; UI consumers receive state without tokens.',
   },
   {
+    key: 'modeldeskAccount',
+    pkg: '@modeldesk/dsh-enterprise',
+    title: 'ModelDesk employee session',
+    mode: 'service',
+    consumers: ['api-remotes'],
+    note: 'Owns the configured ModelDesk origin, browser sign-in, credential rotation, authorized models, and enterprise capabilities.',
+  },
+  {
     key: 'authorization',
     pkg: 'authorization',
     title: 'Authorization flow registry',

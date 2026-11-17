@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="196" viewBox="0 0 600 196">
+<defs>
+    <linearGradient id="modeldesk-gradient" x1="64" y1="64" x2="448" y2="448" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#72D5FA"/>
+      <stop offset="1" stop-color="#4F7DFF"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="196" rx="16" fill="#0E0F12"/>
+<g transform="translate(-3.7 18.3) scale(0.311321)"><g fill="none" stroke="url(#modeldesk-gradient)" stroke-width="48" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 72 328 V 160 L 164 246 L 256 128 L 348 246 L 440 160 V 328"/>
+    <path d="M 72 384 H 440"/>
+  </g></g>
+  <text x="182" y="119.64" font-family="'Microsoft YaHei','PingFang SC','Noto Sans CJK SC','Source Han Sans SC',sans-serif" font-size="61.81818181818182" font-weight="700" letter-spacing="4.95" fill="#F2F3F5">ModelDesk</text>
+</svg>

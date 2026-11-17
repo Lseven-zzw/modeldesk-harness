@@ -267,6 +267,12 @@ export interface InputActions {
    * @returns false when the draft changed or submission locked the editor.
    */
   insertText(text: string, span: TokenSpan): boolean
+  /** Insert a batch of atomic file references at a captured selection.
+   * @param references - ordered file references.
+   * @param span - captured selection and draft revision.
+   * @returns whether the editor accepted the entire batch.
+   */
+  insertReferences(references: readonly ReferenceInsert[], span: TokenSpan): boolean
   /** Replace the whole draft with plain text, removing inline reference chips. */
   setDraft(text: string): void
   /** Write the current semantic document through the mounted persistence callback. */

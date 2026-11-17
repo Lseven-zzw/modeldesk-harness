@@ -2123,6 +2123,91 @@ export const SERVICE_API: readonly ServiceApiEntry[] = [
     ],
   },
   {
+    key: 'modeldeskAccount',
+    summary: 'The enterprise service consumed as `ctx.modeldeskAccount`.',
+    description: 'The enterprise service consumed as `ctx.modeldeskAccount`.',
+    methods: [
+      {
+        signature: 'async state(): Promise<EnterpriseView>',
+        description: 'Read-only snapshot for the settings page.',
+        parameters: [],
+        returns: 'The current account view without tokens.',
+      },
+      {
+        signature: 'async saveBaseUrl(raw: string): Promise<EnterpriseView>',
+        description: 'Save the platform address. Changing it signs out.',
+        parameters: [{ name: 'raw', description: 'address typed by the employee.' }],
+        returns: 'The current account view without tokens.',
+      },
+      {
+        signature: 'subscribe(listener: (view: EnterpriseView) => void): () => void',
+        description: 'Subscribe to state changes; the returned function unsubscribes.',
+        parameters: [{ name: 'listener', description: 'Receives account updates while subscribed.' }],
+        returns: 'A function that removes the listener.',
+      },
+      {
+        signature: 'async accessToken(): Promise<string>',
+        description: 'A usable access token; throws `signed_out`/`session_expired`.',
+        parameters: [],
+        returns: 'A usable access token for the current session.',
+      },
+      {
+        signature: 'async recover(usedToken: string): Promise<string>',
+        description: 'Recover from a 401 on `usedToken`.',
+        parameters: [{ name: 'usedToken', description: 'Token rejected by the previous upstream request.' }],
+        returns: 'A usable access token after session recovery.',
+      },
+      {
+        signature: 'async models(force: boolean = false): Promise<readonly ModelDeskModel[]>',
+        description: 'Authorized models, optionally bypassing the cache.',
+        parameters: [{ name: 'force', description: 'Fetch a fresh catalog even when a cached catalog exists.' }],
+        returns: 'The authorized model catalog.',
+      },
+      {
+        signature: 'async complete(body: Record<string, unknown>, signal?: AbortSignal): Promise<ReadableStream<Uint8Array<ArrayBuffer>>>',
+        description: 'Open a model response using the signed-in employee\'s session.',
+        parameters: [{ name: 'body', description: 'Request or response body for the model gateway.' }, { name: 'signal', description: 'Cancels the outbound request or stream.' }],
+        returns: 'The response body received from the model gateway.',
+      },
+      {
+        signature: 'async capabilities(): Promise<ModelDeskCapabilities>',
+        description: 'Read the published capabilities for the current enterprise account.',
+        parameters: [],
+        returns: 'Authorized skills and MCP services for the current employee.',
+      },
+      {
+        signature: 'async usage(): Promise<ModelDeskUsage>',
+        description: 'This month\'s usage.',
+        parameters: [],
+        returns: 'Usage and quota for the current billing month.',
+      },
+      {
+        signature: 'async startLogin(): Promise<{ authorizeUrl: string; expiresAt: string }>',
+        description: 'Begin sign-in against the saved platform address.',
+        parameters: [],
+        returns: 'The browser authorization URL and its expiration.',
+      },
+      {
+        signature: 'async submitTicket(ticket: string): Promise<EnterpriseView>',
+        description: 'Paste a ticket delivered out of band.',
+        parameters: [{ name: 'ticket', description: 'One-time authorization code copied from the browser.' }],
+        returns: 'The current account view without tokens.',
+      },
+      {
+        signature: 'async cancelLogin(): Promise<EnterpriseView>',
+        description: 'Abort the waiting attempt.',
+        parameters: [],
+        returns: 'The current account view without tokens.',
+      },
+      {
+        signature: 'async logout(): Promise<EnterpriseView>',
+        description: 'Sign out; keeps the platform address.',
+        parameters: [],
+        returns: 'The current account view without tokens.',
+      },
+    ],
+  },
+  {
     key: 'officeToPdf',
     summary: 'A provider lifetime owns all converters, queued calls, and temporary files.',
     description: 'A provider lifetime owns all converters, queued calls, and temporary files.',
@@ -5720,10 +5805,6 @@ export const TYPE_API: readonly TypeApiEntry[] = [
     declaration: 'export interface AuthorizationFlow {\n    readonly key: CredentialKey;\n    readonly label: string;\n    readonly methods: readonly [\n        AuthorizationMethod,\n        ...AuthorizationMethod[]\n    ];\n    run(session: AuthorizationSession): Promise<void>;\n}',
   },
   {
-    name: 'AuthorizationInteraction',
-    declaration: 'export interface AuthorizationInteraction {\n    notify(notice: AuthorizationNotice): void;\n    prompt(prompt: AuthorizationPrompt): Promise<string>;\n}',
-  },
-  {
     name: 'AuthorizationMethod',
     declaration: 'export interface AuthorizationMethod {\n    id: string;\n    label: string;\n}',
   },
@@ -5742,10 +5823,6 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   {
     name: 'AuthorizationPromptOption',
     declaration: 'export interface AuthorizationPromptOption {\n    id: string;\n    label: string;\n    description?: string;\n}',
-  },
-  {
-    name: 'AuthorizationRequest',
-    declaration: 'export interface AuthorizationRequest {\n    key: CredentialKey;\n    method?: string;\n    interaction: AuthorizationInteraction;\n    signal?: AbortSignal;\n}',
   },
   {
     name: 'AuthorizationSession',
@@ -6358,6 +6435,10 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   {
     name: 'EncodedImageAttachment',
     declaration: 'export interface EncodedImageAttachment {\n    mediaType: ImageMediaType;\n    data: string;\n    name?: string;\n}',
+  },
+  {
+    name: 'EnterpriseView',
+    declaration: 'export interface EnterpriseView {\n    readonly baseUrl: string | null;\n    readonly phase: \'unconfigured\' | \'signed-out\' | \'signing-in\' | \'signed-in\';\n    readonly user: ModelDeskUser | null;\n    readonly org: ModelDeskOrg | null;\n    readonly sessionExpiresAt: string | null;\n    readonly models: readonly ModelDeskModel[];\n    readonly error?: {\n        readonly code: string;\n        readonly message: string;\n    };\n    readonly login: {\n        readonly authorizeUrl: string;\n        readonly expiresAt: string;\n    } | null;\n}',
   },
   {
     name: 'EpochHeader',
@@ -7342,6 +7423,42 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   {
     name: 'ModelCatalogModel',
     declaration: 'export interface ModelCatalogModel {\n    readonly id: string;\n    readonly name: string;\n    readonly description?: string;\n    readonly reasoning?: ModelReasoning;\n    readonly badge?: LlmModelBadge;\n}',
+  },
+  {
+    name: 'ModelDeskCapabilities',
+    declaration: 'export interface ModelDeskCapabilities {\n    readonly signedIn: boolean;\n    readonly skills: readonly ModelDeskSkillSummary[];\n    readonly mcp: readonly ModelDeskMcpSummary[];\n}',
+  },
+  {
+    name: 'ModelDeskMcpSummary',
+    declaration: 'export interface ModelDeskMcpSummary {\n    readonly id: number;\n    readonly name: string;\n    readonly description: string;\n    readonly guide: string;\n    readonly tools: readonly ModelDeskMcpToolSummary[];\n}',
+  },
+  {
+    name: 'ModelDeskMcpToolSummary',
+    declaration: 'export interface ModelDeskMcpToolSummary {\n    readonly name: string;\n    readonly description: string;\n    readonly access: \'read\' | \'write\';\n}',
+  },
+  {
+    name: 'ModelDeskModel',
+    declaration: 'export interface ModelDeskModel {\n    readonly id: string;\n    readonly displayName: string;\n    readonly contextWindow: number;\n    readonly capabilities: ModelDeskModelCapabilities;\n}',
+  },
+  {
+    name: 'ModelDeskModelCapabilities',
+    declaration: 'export interface ModelDeskModelCapabilities {\n    readonly streaming: boolean;\n    readonly tools: boolean;\n    readonly reasoningContent: boolean;\n}',
+  },
+  {
+    name: 'ModelDeskOrg',
+    declaration: 'export interface ModelDeskOrg {\n    readonly id: string;\n    readonly name: string;\n}',
+  },
+  {
+    name: 'ModelDeskSkillSummary',
+    declaration: 'export interface ModelDeskSkillSummary {\n    readonly code: string;\n    readonly revision: number;\n    readonly description: string;\n}',
+  },
+  {
+    name: 'ModelDeskUsage',
+    declaration: 'export interface ModelDeskUsage {\n    readonly billingMonth: string;\n    readonly billingTimezone: string;\n    readonly limitTokens: number;\n    readonly usedTokens: number;\n    readonly remainingTokens: number;\n    readonly resetsAt: string;\n}',
+  },
+  {
+    name: 'ModelDeskUser',
+    declaration: 'export interface ModelDeskUser {\n    readonly id: string;\n    readonly username: string;\n    readonly displayName: string;\n    readonly department: string | null;\n}',
   },
   {
     name: 'ModelMessageSource',

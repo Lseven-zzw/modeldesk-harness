@@ -15,8 +15,6 @@ export interface DesktopPaths {
  * @returns immutable desktop path set.
  */
 export function resolveDesktopPaths(dshHome: string = resolveDshHome()): DesktopPaths {
-  return {
-    profile: join(dshHome, 'profiles', 'desktop'),
-    lock: join(dshHome, 'profiles', 'desktop', 'lock'),
-  }
+  const profile = join(dshHome, 'profiles', 'modeldesk')
+  return { profile, lock: join(profile, 'lock') }
 }

@@ -147,6 +147,10 @@ export class SessionInputShell implements SessionInput {
       if (span.draftRev !== this.rev) return false
       return this.draftEditor.insertAsyncText(span, text)
     },
+    insertReferences: (references, span) => {
+      if (frozen(this.snapshot.phase) || this.disposed || span.draftRev !== this.rev) return false
+      return this.draftEditor.insertFileReferences(references, span)
+    },
     setDraft: (text) => { this.setDraft(text) },
     persistDraft: () => { this.persistCurrentDraft() },
     addAttachments: ids => this.addAttachments(ids),

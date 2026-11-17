@@ -136,6 +136,7 @@ const kit: Omit<QuestionComposerProps, 'matched'> = {
     insertQuote: () => false,
     captureInsertion: () => ({ start: 0, end: 0, draftRev: 0 }),
     insertText: () => false,
+    insertReferences: () => false,
     setDraft: () => { throw new Error('unused') },
     persistDraft: () => { throw new Error('unused') },
     addAttachments: () => { throw new Error('unused') },

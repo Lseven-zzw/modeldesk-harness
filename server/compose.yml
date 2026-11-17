@@ -1,0 +1,52 @@
+name: modeldesk
+
+services:
+  mysql:
+    image: mysql:5.7
+    restart: unless-stopped
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --explicit_defaults_for_timestamp=1
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set MYSQL_ROOT_PASSWORD in .env}
+      MYSQL_DATABASE: modeldesk
+      MYSQL_USER: modeldesk
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?set MYSQL_PASSWORD in .env}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysql -h 127.0.0.1 -umodeldesk -p\"$$MYSQL_PASSWORD\" modeldesk -e 'SELECT 1'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  server:
+    build:
+      context: .
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      MODELDESK_DATABASE_URL: ${MODELDESK_COMPOSE_DATABASE_URL:?set MODELDESK_COMPOSE_DATABASE_URL in .env}
+      MODELDESK_SECRET_KEY: ${MODELDESK_SECRET_KEY:?set MODELDESK_SECRET_KEY in .env}
+      MODELDESK_MASTER_KEY: ${MODELDESK_MASTER_KEY:?set MODELDESK_MASTER_KEY in .env}
+      MODELDESK_BASE_URL: ${MODELDESK_BASE_URL:-http://127.0.0.1:8080}
+      MODELDESK_SEED_ADMIN_PASSWORD: ${MODELDESK_SEED_ADMIN_PASSWORD:-}
+      MODELDESK_SEED_EMPLOYEE_PASSWORD: ${MODELDESK_SEED_EMPLOYEE_PASSWORD:-}
+      MODELDESK_SEED_UPSTREAM_BASE: ${MODELDESK_SEED_UPSTREAM_BASE:-}
+      MODELDESK_SEED_UPSTREAM_KEY: ${MODELDESK_SEED_UPSTREAM_KEY:-}
+      MODELDESK_SEED_MODEL_CODE: ${MODELDESK_SEED_MODEL_CODE:-deepseek-chat}
+      MODELDESK_SEED_MODEL_NAME: ${MODELDESK_SEED_MODEL_NAME:-DeepSeek Chat}
+      MODELDESK_SEED_UPSTREAM_MODEL: ${MODELDESK_SEED_UPSTREAM_MODEL:-deepseek-chat}
+    ports:
+      - "8080:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=3)\""]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mysql-data:

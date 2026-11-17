@@ -89,6 +89,7 @@ export const SERVICE_PAGE: Record<string, string> = {
   authorization: 'credentials.md',
   deepseekAccount: 'credentials.md',
   credentials: 'credentials.md',
+  modeldeskAccount: 'credentials.md',
   credentialsController: 'credentials.md',
   settingsController: 'settings.md',
   directoryPicker: 'workspace.md',
@@ -956,6 +957,7 @@ export const LINK_MAP: Readonly<Record<string, string>> = {
 /** TypeScript lib and pinned framework types with no repository-owned data page. */
 export const FOUNDATION_TYPE_NAMES: ReadonlySet<string> = new Set([
   'Entry', 'Array',
+  'ArrayBuffer', 'ReadableStream',
   'Plugin',
   'AbortSignal',
   'Headers',
@@ -987,6 +989,10 @@ export const FOUNDATION_TYPE_NAMES: ReadonlySet<string> = new Set([
 
 /** Project types deliberately documented outside the subsystems catalog. */
 export const TYPE_LINK_EXEMPTIONS: Readonly<Record<string, string>> = {
+  EnterpriseView: 'authorized account view is defined in packages/modeldesk/enterprise/src/types.ts',
+  ModelDeskModel: 'employee model catalog entry is defined in packages/modeldesk/enterprise/src/types.ts',
+  ModelDeskCapabilities: 'authorized capabilities are defined in packages/modeldesk/enterprise/src/types.ts',
+  ModelDeskUsage: 'employee usage data is defined in packages/modeldesk/enterprise/src/types.ts',
   ActionCardDecision: 'packages/experimental/action-cards/README.md',
   ActionCardKind: 'packages/experimental/action-cards/README.md',
   ActionCardResult: 'packages/experimental/action-cards/README.md',

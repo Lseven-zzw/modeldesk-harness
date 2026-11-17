@@ -71,8 +71,21 @@ import { DesktopUpdateOverlays } from './update-overlay.ts'
 import { DesktopQuitConfirmation } from './quit-confirmation.ts'
 import { DesktopTray } from './tray.ts'
 import { DesktopBackgroundNotice } from './background-notice.ts'
+import { resolveDshHome } from '@deepseek-ai/dsh-home-paths'
+import { connectModelDeskLogin, MODELDESK_SCHEME, parseModelDeskLoginLink } from './modeldesk-login.ts'
 
 let focusPrimaryWindow = (): void => {}
+let pendingModelDeskServer: string | undefined
+let drainModelDeskLogin = (): void => {}
+
+function receiveModelDeskLogin(argv: readonly string[] = []): void {
+  const links = argv.filter(arg => arg.startsWith('modeldesk:'))
+  if (links.length !== 1) return
+  const server = parseModelDeskLoginLink(links[0]!)
+  if (server === undefined) return
+  pendingModelDeskServer = server
+  drainModelDeskLogin()
+}
 let stopForRecovery = async (): Promise<void> => { await stopOperationReports() }
 let shuttingDown = false
 /**
@@ -262,6 +275,7 @@ function platformLoginUrl(authorizeUrl: string): string {
 
 function createWindow(preload: string, show = false, primary = false): BrowserWindow {
   const window = new BrowserWindow({
+    title: 'ModelDesk Harness',
     width: 1280,
     height: 820,
     minWidth: 520,
@@ -377,6 +391,7 @@ async function main(): Promise<void> {
   const resources = runtimeResources()
   const paths = resolveDesktopPaths()
   const development = !app.isPackaged
+  const upstreamWelcome = process.env.DSH_DESKTOP_UPSTREAM_WELCOME === '1'
   const primaryRuntime = development
     ? developmentPrimaryRuntime()
     : join(process.resourcesPath, 'runtime', 'primary-runtime')
@@ -483,6 +498,7 @@ async function main(): Promise<void> {
   const browserGuests = new DesktopBrowserGuests(() => hostUrl)
   let injections: readonly unknown[] = []
   let welcomeBackend: DesktopWelcomeBackend | undefined
+  let enterpriseAccountOnly = false
   let reportedLaunch = false
   let analyticsEnabled = false
   const track = async <K extends keyof ProductEventMap>(eventName: K, attributes: ProductEventMap[K]): Promise<void> => {
@@ -534,6 +550,7 @@ async function main(): Promise<void> {
         operationJournal.enqueue(JSON.stringify(record))
       })
     return {
+      get pid() { return host.pid },
       start: async () => {
         const ready = await host.start()
         const cookie = await authenticateWebHost(ready.url)
@@ -543,10 +560,13 @@ async function main(): Promise<void> {
           .catch((error: unknown) => { console.error('desktop: legacy Host cookie cleanup failed', error) })
         if (ready.injections === undefined) throw new Error('Desktop Host did not provide boot injections')
         injections = ready.injections
+        enterpriseAccountOnly = ready.accountMode === 'enterprise'
         welcomeBackend = connectDesktopWelcome(ready.url, cookie)
         analyticsEnabled = await welcomeBackend.analyticsEnabled().catch(() => false)
         if (!reportedLaunch) { reportedLaunch = true; void track('desktop_app_launch', {}) }
         stopAccount?.()
+        stopAccount = undefined
+        if (enterpriseAccountOnly) return
         const accountBackend = welcomeBackend.account
         stopAccount = accountBackend.watch((state) => {
           if (quitting) return
@@ -561,7 +581,7 @@ async function main(): Promise<void> {
             focusPrimaryWindow()
           }
           if (state.status === 'credential-stored' && attempt?.phase === 'succeeded' && welcomeWindow !== undefined) void enterWorkspace({ activate: false }).catch(() => undefined)
-          if (previousAccountStatus === 'credential-stored' && state.status === 'signed-out') {
+          if (upstreamWelcome && previousAccountStatus === 'credential-stored' && state.status === 'signed-out') {
             void readWelcomeState().then(async (value) => {
               if (needsWelcome(value) && !quitting) {
                 enteredWorkspace = false
@@ -575,6 +595,7 @@ async function main(): Promise<void> {
         }, () => {
           // The stream reconnects; a transport failure does not change account state.
         }, () => {
+          if (!upstreamWelcome) return
           void readWelcomeState().then(async (value) => {
             if (!needsWelcome(value) || quitting) return
             pendingWelcomeNotice = 'session-expired'
@@ -601,7 +622,10 @@ async function main(): Promise<void> {
     }
   }, (state) => {
     if (state.phase === 'error') reportFatal(state.failure, 'host')
-    else if (!shuttingDown) backendReady = state.phase === 'ready'
+    else if (!shuttingDown) {
+      backendReady = state.phase === 'ready'
+      if (backendReady) drainModelDeskLogin()
+    }
   })
 
   const updateErrors = new WeakMap<DesktopUpdateState, Promise<void>>()
@@ -933,6 +957,7 @@ async function main(): Promise<void> {
   })
   ipcMain.handle(DESKTOP_IPC.onboardingApiKey, async (event) => {
     assertProductSender(event)
+    if (enterpriseAccountOnly) return false
     return (await readWelcomeState()).hasApiKey
   })
   ipcMain.on(DESKTOP_IPC.onboardingActive, (event, active: unknown) => {
@@ -1131,11 +1156,11 @@ async function main(): Promise<void> {
   const applicationIconPath = development ? join(app.getAppPath(), 'resources', 'icon-windows.png')
     : join(process.resourcesPath, 'icon.png')
   app.setAboutPanelOptions({
-    applicationName: 'DeepSeek Harness',
+    applicationName: 'ModelDesk Harness · ModelDesk Harness',
     applicationVersion: app.getVersion(),
     // The release has no separate build number; omit Electron's bundle version.
     version: '',
-    copyright: '',
+    copyright: '山东金东数字传媒',
     iconPath: applicationIconPath,
   })
   // A custom application menu replaces Electron's default menu, so macOS needs
@@ -1364,7 +1389,7 @@ async function main(): Promise<void> {
   }
   let openingWelcome: Promise<void> | undefined
   const showWelcome = (): Promise<void> => {
-    if (quitting) return Promise.resolve()
+    if (quitting || enterpriseAccountOnly) return Promise.resolve()
     if (welcomeWindow !== undefined && !welcomeWindow.isDestroyed()) {
       if (!welcomeWindow.isVisible()) void track('auth_page_view', {})
       welcomeWindow.show()
@@ -1426,13 +1451,14 @@ async function main(): Promise<void> {
   }
   const openInitialWindow = async (): Promise<void> => {
     if (quitting || recovery.active) return
-    const state = await readWelcomeState()
+    const state = enterpriseAccountOnly ? undefined : await readWelcomeState()
+    const preference = state === undefined ? await welcomeBackend?.readLocalePreference() : state.localePreference
     if (isQuitting() || backend.state.phase !== 'ready') return
-    locale = resolveDesktopStartupLocale(state.localePreference, systemLanguages)
+    locale = resolveDesktopStartupLocale(preference ?? null, systemLanguages)
     writeDesktopLocaleCache(app.getPath('userData'), locale.id)
     windowsLanguage = locale.id
     refreshApplicationMenu()
-    if (!enteredWorkspace && needsWelcome({ loggedIn: state.loggedIn, hasApiKey: state.hasApiKey })) {
+    if (!enteredWorkspace && upstreamWelcome && state !== undefined && needsWelcome(state)) {
       // A later login must retain its own activation policy instead of replaying startup focus.
       raiseAfterUpdate = false
       await showWelcome()
@@ -1456,11 +1482,34 @@ async function main(): Promise<void> {
     window.focus()
   }
 
-  if (app.isPackaged || process.env.DSH_DESKTOP_DEV_APP === '1') app.setAsDefaultProtocolClient('dsh')
-  app.on('open-url', (event, url) => {
-    event.preventDefault()
-    if (url === 'dsh://open' || url === 'dsh://open/') focusPrimaryWindow()
-  })
+  let modeldeskLoginActive = false
+  drainModelDeskLogin = () => {
+    const pid = backend.host?.pid
+    const server = pendingModelDeskServer
+    if (pid === undefined || server === undefined || modeldeskLoginActive || isQuitting()) return
+    pendingModelDeskServer = undefined
+    modeldeskLoginActive = true
+    void (async () => {
+      const login = await connectModelDeskLogin(resolveDshHome(), pid)
+      const current = login.state.user?.displayName
+      const detail = current === undefined ? '当前没有已登录的企业账号。' : `当前账号：${current}`
+      const confirmation = await dialog.showMessageBox({
+        type: 'question', title: 'ModelDesk Harness企业登录',
+        message: '是否登录到此企业平台？', detail: `${server}\n${detail}`,
+        buttons: ['继续登录', '取消'], defaultId: 1, cancelId: 1, noLink: true,
+      })
+      if (confirmation.response === 0 && !isQuitting() && backend.host?.pid === pid) await login.start(server)
+    })().catch((error: unknown) => {
+      if (!isQuitting()) dialog.showErrorBox('ModelDesk Harness企业登录', error instanceof Error ? error.message : '无法启动登录')
+    }).finally(() => {
+      modeldeskLoginActive = false
+      drainModelDeskLogin()
+    })
+  }
+  if (app.isPackaged || process.env.DSH_DESKTOP_DEV_APP === '1') {
+    app.setAsDefaultProtocolClient('dsh')
+    app.setAsDefaultProtocolClient(MODELDESK_SCHEME)
+  }
 
   app.on('activate', (_event, hasVisibleWindows) => {
     if (!hasVisibleWindows) focusPrimaryWindow()
@@ -1563,6 +1612,7 @@ async function main(): Promise<void> {
   }
   automaticCheck()
   await reconcileBackend().catch(() => undefined)
+  drainModelDeskLogin()
   // Window lifecycle callbacks run while backend startup is pending.
   if (isQuitting()) return
   const window = currentMainWindow()
@@ -1572,7 +1622,19 @@ async function main(): Promise<void> {
   publishUpdate(updateState)
 }
 
-const ownsDesktopInstance = claimDesktopSingleInstance(app, () => { focusPrimaryWindow() })
+const ownsDesktopInstance = claimDesktopSingleInstance(app, argv => {
+  focusPrimaryWindow()
+  receiveModelDeskLogin(argv)
+})
+
+if (ownsDesktopInstance) {
+  receiveModelDeskLogin(process.argv)
+  app.on('open-url', (event, url) => {
+    event.preventDefault()
+    if (url === 'dsh://open' || url === 'dsh://open/') focusPrimaryWindow()
+    else receiveModelDeskLogin([url])
+  })
+}
 
 if (ownsDesktopInstance) void app.whenReady().then(main).catch(async (error: unknown) => {
   const message = error instanceof Error ? error.message : String(error)
