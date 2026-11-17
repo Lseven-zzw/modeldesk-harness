@@ -3,14 +3,17 @@
 # After editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write README.md
 /modeldesk-harness:
-  en: 6c8525fcc8c38b01
-  zh: 5b2d241d30b7e035
+  en: a8711b87269291b7
+  zh: 6f934ca4234f7144
 /modeldesk-harness/run-the-server-and-management-console:
-  en: c139add3cec5ec4c
-  zh: 4e09dbef2e7b590b
-/modeldesk-harness/develop-the-desktop-client:
-  en: b44256051cf35435
-  zh: 9c975ea532c5db3e
+  en: 22e644b59a964f44
+  zh: 1273ef66082eeb2e
+/modeldesk-harness/run-the-desktop-client-from-source:
+  en: 13ad43fb5621729a
+  zh: ce508c2e28b6a84f
+/modeldesk-harness/contributing-and-support:
+  en: d00f47d20402e0b1
+  zh: ef53402c54ddd54c
 /modeldesk-harness/license:
   en: 0cfe2bc4959dd41d
   zh: eb35a9bf61458f78

@@ -5,7 +5,7 @@
   "private": true,
   "license": "MIT",
   "author": {
-    "name": "山东金东数字传媒"
+    "name": "ModelDesk Harness contributors"
   },
   "type": "module",
   "main": "lib/main.js",

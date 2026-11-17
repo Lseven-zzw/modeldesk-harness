@@ -51,8 +51,8 @@ describe('installer preparation preserves application dependencies', () => {
         metadata: { value: metadata },
       })
       const appInfo = new AppInfo(metadataPackager, undefined)
-      expect(appInfo.companyName).toBe('山东金东数字传媒')
-      expect(appInfo.copyright).toBe(`Copyright © ${new Date().getFullYear()} ${platform === 'win32' ? 'ModelDesk Harness' : 'ModelDesk Harness'}`)
+      expect(appInfo.companyName).toBe('ModelDesk Harness contributors')
+      expect(appInfo.copyright).toBe(`Copyright © ${new Date().getFullYear()} ModelDesk Harness`)
       // The physical executable stays ASCII so cmd.exe launchers and the derived Windows
       // installation directory never inherit non-ASCII bytes or the upstream package name.
       expect(config.executableName).toBe('ModelDesk Harness')
@@ -119,6 +119,7 @@ describe('installer preparation preserves application dependencies', () => {
     const config = createElectronBuilderConfig({
       DSH_DESKTOP_APP_ID: 'com.example.installer',
       DSH_DESKTOP_AUTO_UPDATE_ENV: 'production',
+      DOWNLOAD_PROD_ORIGIN: 'https://downloads.example.com',
       DSH_DESKTOP_MANDATORY_UPDATE_TEST_ORIGIN: 'https://harness-test.deepseek.com',
       DSH_DESKTOP_MANDATORY_UPDATE_PROD_ORIGIN: 'https://policy.example.com',
       DSH_DESKTOP_MACOS_SIGNING_IDENTITY: 'Example Company (TEAMID1234)',

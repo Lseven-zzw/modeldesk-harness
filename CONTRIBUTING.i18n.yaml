@@ -2,6 +2,12 @@
 # section, a hash of its English and Chinese blocks outside code blocks and generated regions.
 # After editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write CONTRIBUTING.md
-/contributing:
-  en: 08d2f421ff3617f4
-  zh: 9d060d70ad186dc5
+/contributing-to-modeldesk-harness:
+  en: 1fd114d43f601c3e
+  zh: cb311c3d3f3134d0
+/contributing-to-modeldesk-harness/open-a-pull-request:
+  en: 346645ac9cf3385c
+  zh: d97089b4b56cd32a
+/contributing-to-modeldesk-harness/local-checks:
+  en: a73191ef62e831b8
+  zh: 6fcfe70d5c5f5ae8

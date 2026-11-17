@@ -17,7 +17,7 @@ const tokenBody = {
   session_id: 'gsess_01',
   session_expires_at: new Date(Date.now() + 2_592_000_000).toISOString(),
   user: { id: '1001', username: 'zhang.san', display_name: '张三', department: '剪辑部' },
-  org: { id: 'modeldesk', name: '山东金东数字传媒' },
+  org: { id: 'modeldesk', name: '示例组织' },
 }
 
 function json(body: unknown, status = 200): Response {
@@ -120,7 +120,7 @@ describe('LoginFlow', () => {
   it('does not store tokens when the exchange returns after cancellation', async () => {
     const { fetchImpl } = fakePlatform()
     let release = () => {}
-    const gate = new Promise<void>(resolve => { release = resolve })
+    const gate = new Promise<void>((resolve) => { release = resolve })
     let exchangeStarted = false
     const { credentials, flow } = await harness(async (input, init) => {
       if (String(input).endsWith('/token')) {
@@ -134,7 +134,7 @@ describe('LoginFlow', () => {
     await vi.waitFor(() => { expect(exchangeStarted).toBe(true) })
     await flow.cancel()
     release()
-    await new Promise<void>(resolve => { setImmediate(resolve) })
+    await new Promise<void>((resolve) => { setImmediate(resolve) })
     expect(await credentials.readRecord(SESSION_KEY)).toBeUndefined()
     expect(flow.current()).toBeUndefined()
   })
