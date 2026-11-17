@@ -10,7 +10,7 @@ const tokenWire = {
   session_id: 'gsess_01',
   session_expires_at: '2026-12-09T02:00:00Z',
   user: { id: '1001', username: 'zhang.san', display_name: '张三', department: '剪辑部' },
-  org: { id: 'modeldesk', name: '山东金东数字传媒' },
+  org: { id: 'modeldesk', name: '示例组织' },
 }
 
 describe('normalizeBaseUrl', () => {

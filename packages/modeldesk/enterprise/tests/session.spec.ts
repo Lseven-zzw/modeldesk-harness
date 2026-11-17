@@ -18,7 +18,7 @@ function signedIn(overrides: Partial<ModelDeskSignedIn> = {}): ModelDeskSignedIn
     refreshExpiresAt: Date.now() + 2_592_000_000,
     absoluteExpiresAt: Date.now() + 2_592_000_000,
     user: { id: '1001', username: 'zhang.san', displayName: '张三', department: '剪辑部' },
-    org: { id: 'modeldesk', name: '山东金东数字传媒' },
+    org: { id: 'modeldesk', name: '示例组织' },
     models: [],
     modelsFetchedAt: 0,
     ...overrides,
@@ -35,7 +35,7 @@ function tokenResponse(access: string, refresh: string): Response {
     session_id: 'gsess_01',
     session_expires_at: new Date(Date.now() + 2_592_000_000).toISOString(),
     user: { id: '1001', username: 'zhang.san', display_name: '张三', department: '剪辑部' },
-    org: { id: 'modeldesk', name: '山东金东数字传媒' },
+    org: { id: 'modeldesk', name: '示例组织' },
   }), { status: 200, headers: { 'content-type': 'application/json' } })
 }
 

@@ -79,9 +79,9 @@ let pendingModelDeskServer: string | undefined
 let drainModelDeskLogin = (): void => {}
 
 function receiveModelDeskLogin(argv: readonly string[] = []): void {
-  const links = argv.filter(arg => arg.startsWith('modeldesk:'))
-  if (links.length !== 1) return
-  const server = parseModelDeskLoginLink(links[0]!)
+  const [link, nextLink] = argv.filter(arg => arg.startsWith('modeldesk:'))
+  if (link === undefined || nextLink !== undefined) return
+  const server = parseModelDeskLoginLink(link)
   if (server === undefined) return
   pendingModelDeskServer = server
   drainModelDeskLogin()
@@ -1160,7 +1160,7 @@ async function main(): Promise<void> {
     applicationVersion: app.getVersion(),
     // The release has no separate build number; omit Electron's bundle version.
     version: '',
-    copyright: '山东金东数字传媒',
+    copyright: 'MIT License',
     iconPath: applicationIconPath,
   })
   // A custom application menu replaces Electron's default menu, so macOS needs
@@ -1622,7 +1622,7 @@ async function main(): Promise<void> {
   publishUpdate(updateState)
 }
 
-const ownsDesktopInstance = claimDesktopSingleInstance(app, argv => {
+const ownsDesktopInstance = claimDesktopSingleInstance(app, (argv) => {
   focusPrimaryWindow()
   receiveModelDeskLogin(argv)
 })

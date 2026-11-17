@@ -62,7 +62,7 @@ def test_happy_path_issues_tokens(db):
     assert issued.session.status == "ACTIVE"
     auth = service.authenticate_access(db, access_token=issued.access_token, now=now)
     assert auth.user.id == user.id
-    payload = service.token_payload(issued, user, "modeldesk", "山东金东数字传媒")
+    payload = service.token_payload(issued, user, "modeldesk", "示例组织")
     assert payload["token_type"] == "Bearer"
     assert payload["expires_in"] == 600
     assert payload["refresh_expires_in"] == 2_592_000
@@ -72,7 +72,7 @@ def test_happy_path_issues_tokens(db):
         "display_name": "张三",
         "department": "剪辑部",
     }
-    assert payload["org"] == {"id": "modeldesk", "name": "山东金东数字传媒"}
+    assert payload["org"] == {"id": "modeldesk", "name": "示例组织"}
 
 
 def test_ticket_is_one_time_and_burns_on_failure(db):

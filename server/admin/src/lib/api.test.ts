@@ -18,7 +18,7 @@ describe('admin api client', () => {
       if (url.endsWith('/session')) {
         return jsonResponse(200, {
           user: { id: 1, username: 'admin', display_name: '管理员', department: null, role: 'ADMIN', status: 1, created_at: '2026-11-09T00:00:00' },
-          csrf_token: 'csrf-123', org_name: '山东金东数字传媒',
+          csrf_token: 'csrf-123', org_name: '示例组织',
         })
       }
       return jsonResponse(201, { id: 2, username: 'zhang.san', display_name: '张三', department: '剪辑部', role: 'EMPLOYEE', status: 1, created_at: '2026-11-09T00:00:00' })
@@ -49,7 +49,7 @@ describe('admin api client', () => {
       if (url.endsWith('/session')) {
         return jsonResponse(200, {
           user: { id: 1, username: 'admin', display_name: '管理员', department: null, role: 'ADMIN', status: 1, created_at: '2026-11-09T00:00:00' },
-          csrf_token: 'csrf-123', org_name: '山东金东数字传媒',
+          csrf_token: 'csrf-123', org_name: '示例组织',
         })
       }
       if (url.endsWith('/models/7/grants')) {
@@ -76,7 +76,7 @@ describe('admin api client', () => {
       if (url.endsWith('/session')) {
         return jsonResponse(200, {
           user: { id: 1, username: 'admin', display_name: '管理员', department: null, role: 'ADMIN', status: 1, created_at: '2026-11-09T00:00:00' },
-          csrf_token: 'csrf-123', org_name: '山东金东数字传媒',
+          csrf_token: 'csrf-123', org_name: '示例组织',
         })
       }
       return jsonResponse(200, { month: '2026-11', total: 0, items: [] })
